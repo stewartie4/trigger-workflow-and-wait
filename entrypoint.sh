@@ -102,8 +102,6 @@ wait_for_workflow_to_finish() {
   counter=0;
   while [[ "$last_workflow" == "null" && $counter -lt 30 ]]
   do
-    echo "Using the following params to filter the workflow runs to get the triggered run id -"
-    echo "Query params: ${query}"
     last_workflow_response=$(curl -s -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
       -H 'Accept: application/vnd.github.antiope-preview+json' \
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}")
@@ -137,18 +135,19 @@ wait_for_workflow_to_finish() {
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '.workflow_runs[] | select(.id == '${last_workflow_id}')')
     conclusion=$(echo "${workflow}" | jq '.conclusion')
     status=$(echo "${workflow}" | jq '.status')
-    echo "Checking conclusion [${conclusion}]"
-    echo "Checking status [${status}]"
+    echo "Workflow conclusion is [${conclusion}]"
+    echo "Workflow status is [${status}]"
     echo "The workflow logs can be found at ${last_workflow_url}"
     echo
   done
 
+   echo "The workflow logs can be found at ${last_workflow_url}"
   if [[ "${conclusion}" == "\"success\"" && "${status}" == "\"completed\"" ]]
   then
-    echo "Yes, success"
+    echo "Workflow exited successfully"
   else
     # Alternative "failure"
-    echo "Conclusion is not success, its [${conclusion}]."
+    echo "Workflow did not exit successfully, exited with a status of [${conclusion}]."
     if [ "${propagate_failure}" = true ]
     then
       echo "Propagating failure to upstream job"
