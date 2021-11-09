@@ -83,8 +83,6 @@ validate_args() {
 }
 
 trigger_workflow() {
-  echo "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/dispatches"
-
   curl -s --fail -X POST "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/dispatches" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/json" \
@@ -101,7 +99,8 @@ wait_for_workflow_to_finish() {
     query="${query}&actor=${INPUT_GITHUB_USER}"
   fi
   last_workflow="null"
-  while [[ "$last_workflow" == "null" ]]
+  counter=0;
+  while [[ "$last_workflow" == "null" && $counter -lt 30 ]]
   do
     echo "Using the following params to filter the workflow runs to get the triggered run id -"
     echo "Query params: ${query}"
@@ -111,7 +110,8 @@ wait_for_workflow_to_finish() {
      
     echo $last_workflow_response
     last_workflow=$(echo $last_workflow_response | jq '[.workflow_runs[]] | first')
-     sleep 1
+    ((counter=counter+1))
+    sleep 1
   done
   last_workflow_id=$(echo "${last_workflow}" | jq '.id')
   last_workflow_url="${GITHUB_SERVER_URL}/${INPUT_OWNER}/${INPUT_REPO}/actions/runs/${last_workflow_id}"
