@@ -107,9 +107,10 @@ wait_for_workflow_to_finish() {
   do
     echo "Using the following params to filter the workflow runs to get the triggered run id -"
     echo "Query params: ${query}"
-    last_workflow=$(curl -s -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
+    last_workflow=$(curl -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
       -H 'Accept: application/vnd.github.antiope-preview+json' \
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '[.workflow_runs[]] | first')
+     sleep 5
   done
   last_workflow_id=$(echo "${last_workflow}" | jq '.id')
   last_workflow_url="${GITHUB_SERVER_URL}/${INPUT_OWNER}/${INPUT_REPO}/actions/runs/${last_workflow_id}"
