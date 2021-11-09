@@ -107,7 +107,7 @@ wait_for_workflow_to_finish() {
     echo "Query params: ${query}"
     last_workflow_response=$(curl -s -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
       -H 'Accept: application/vnd.github.antiope-preview+json' \
-      -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '[.workflow_runs[]] | first')
+      -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}")
      
     echo $last_workflow_response
     last_workflow=$(echo $last_workflow_response | jq '[.workflow_runs[]] | first')
