@@ -15,7 +15,7 @@ GITHUB_API_URL="${API_URL:-https://api.github.com}"
 GITHUB_SERVER_URL="${SERVER_URL:-https://github.com}"
 
 validate_args() {
-  wait_interval=10 # Waits for 10 seconds
+  wait_interval=60 # Waits for 60 seconds
   if [ "${INPUT_WAITING_INTERVAL}" ]
   then
     wait_interval=${INPUT_WAITING_INTERVAL}
