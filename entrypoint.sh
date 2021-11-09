@@ -108,11 +108,16 @@ wait_for_workflow_to_finish() {
       -H 'Accept: application/vnd.github.antiope-preview+json' \
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}")
      
-    echo $last_workflow_response
     last_workflow=$(echo $last_workflow_response | jq '[.workflow_runs[]] | first')
     ((counter=counter+1))
     sleep 1
   done
+  
+  if [ "$last_workflow" == "null" ]; then
+      echo "Workflow was not triggered after 30s. Failing."
+      exit 1
+  fi
+  
   last_workflow_id=$(echo "${last_workflow}" | jq '.id')
   last_workflow_url="${GITHUB_SERVER_URL}/${INPUT_OWNER}/${INPUT_REPO}/actions/runs/${last_workflow_id}"
   echo "The workflow id is [${last_workflow_id}]."
