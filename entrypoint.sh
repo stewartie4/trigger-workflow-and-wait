@@ -132,6 +132,8 @@ wait_for_workflow_to_finish() {
     status=$(echo "${workflow}" | jq '.status')
     echo "Checking conclusion [${conclusion}]"
     echo "Checking status [${status}]"
+    echo "The workflow logs can be found at ${last_workflow_url}"
+    echo
   done
 
   if [[ "${conclusion}" == "\"success\"" && "${status}" == "\"completed\"" ]]
