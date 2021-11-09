@@ -85,12 +85,12 @@ validate_args() {
 trigger_workflow() {
   echo "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/dispatches"
 
-  curl --fail -X POST "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/dispatches" \
+  curl -s --fail -X POST "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/dispatches" \
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
     --data "{\"ref\":\"${ref}\",\"inputs\":${inputs}}"
-  echo "Sleeping for ${wait_interval} seconds"
+  echo "Sleeping for ${wait_interval} seconds..."
   sleep $wait_interval
 }
 
@@ -107,7 +107,7 @@ wait_for_workflow_to_finish() {
   do
     echo "Using the following params to filter the workflow runs to get the triggered run id -"
     echo "Query params: ${query}"
-    last_workflow=$(curl -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
+    last_workflow=$(curl -s -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" \
       -H 'Accept: application/vnd.github.antiope-preview+json' \
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '[.workflow_runs[]] | first')
   done
@@ -123,9 +123,9 @@ wait_for_workflow_to_finish() {
 
   while [[ "${conclusion}" == "null" && "${status}" != "\"completed\"" ]]
   do
-    echo "Sleeping for \"${wait_interval}\" seconds"
+    echo "Sleeping for \"${wait_interval}\" seconds..."
     sleep "${wait_interval}"
-    workflow=$(curl -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs" \
+    workflow=$(curl -s -X GET "${GITHUB_API_URL}/repos/${INPUT_OWNER}/${INPUT_REPO}/actions/workflows/${INPUT_WORKFLOW_FILE_NAME}/runs" \
       -H 'Accept: application/vnd.github.antiope-preview+json' \
       -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" | jq '.workflow_runs[] | select(.id == '${last_workflow_id}')')
     conclusion=$(echo "${workflow}" | jq '.conclusion')
