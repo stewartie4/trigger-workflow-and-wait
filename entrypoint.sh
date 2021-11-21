@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+set -o xtrace
 
 usage_docs() {
   echo ""
