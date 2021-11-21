@@ -87,7 +87,7 @@ trigger_workflow() {
     -H "Accept: application/vnd.github.v3+json" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
-    --data "{\"ref\":\"${ref}\",\"inputs\":${inputs}}" || { echo "Failed to execute workflow. Check target branch exists in [${INPUT_OWNER}/${INPUT_REPO}]" && exit 1 }
+    --data "{\"ref\":\"${ref}\",\"inputs\":${inputs}}" \ || { echo "Failed to execute workflow. Check target branch exists in [${INPUT_OWNER}/${INPUT_REPO}]" && exit 1; }
 }
 
 wait_for_workflow_to_finish() {
